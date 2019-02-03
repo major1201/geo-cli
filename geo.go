@@ -54,24 +54,45 @@ func parseRecord(record *geoip2.City, language string) *Geo {
 }
 
 // Query a host for record data
-func Query(host string, db *geoip2.Reader, language string) *RetData {
-	ret := RetData{
-		Host:  host,
-		Error: false,
-	}
-	ipaddr, err := net.ResolveIPAddr("ip", host)
+func Query(host string, db *geoip2.Reader, language string) []*RetData {
+	ips, err := net.LookupIP(host)
 	if err != nil {
-		ret.Error = true
-		ret.Message = "can't resolve host"
-		return &ret
+		return []*RetData{
+			{
+				Host:    host,
+				Error:   true,
+				Message: "can't resolve host",
+			},
+		}
 	}
-	ret.IP = ipaddr.IP
 
-	record, err := db.City(ret.IP)
-	if err != nil {
-		ret.Error = true
-		ret.Message = "error"
+	rets := make([]*RetData, 0)
+
+MainLoop:
+	for i, ip := range ips {
+		// distinct results
+		for j := 0; j < i; j++ {
+			if ip.Equal(ips[j]) {
+				continue MainLoop
+			}
+		}
+
+		// query geo data
+		ret := &RetData{
+			Host:  host,
+			IP:    ip,
+			Error: false,
+		}
+		record, err := db.City(ip)
+		if err != nil {
+			ret.Error = true
+			ret.Message = err.Error()
+		} else {
+			ret.Geo = parseRecord(record, language)
+		}
+
+		rets = append(rets, ret)
 	}
-	ret.Geo = parseRecord(record, language)
-	return &ret
+
+	return rets
 }

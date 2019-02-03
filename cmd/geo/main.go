@@ -18,7 +18,7 @@ import (
 var logger = logging.New("GEO")
 
 // AppVer means the project's version
-const AppVer = "0.1.0"
+const AppVer = "0.2.0"
 
 func pipe(db *geoip2.Reader, language string) {
 	ipReg, err := regexp.Compile(goutils.RegIPv4)
@@ -36,7 +36,7 @@ func pipe(db *geoip2.Reader, language string) {
 		if ip == "" {
 			fmt.Println(line)
 		} else {
-			data := geo.Query(ip, db, language)
+			data := geo.Query(ip, db, language)[0]
 			if !data.Error {
 				res := goutils.FilterBlankString([]string{data.Geo.CountryName, data.Geo.SubdivisionName, data.Geo.CityName})
 				if len(res) == 0 {
@@ -95,9 +95,9 @@ func runApp(c *cli.Context) {
 		return
 	}
 
-	dataArray := make([]*geo.RetData, c.NArg())
-	for i, host := range c.Args() {
-		dataArray[i] = geo.Query(host, db, c.String("language"))
+	dataArray := make([]*geo.RetData, 0)
+	for _, host := range c.Args() {
+		dataArray = append(dataArray, geo.Query(host, db, c.String("language"))...)
 	}
 
 	if c.Bool("json") {
