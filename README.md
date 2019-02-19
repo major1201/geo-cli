@@ -7,7 +7,7 @@ Geo cli tool written in Golang using MaxMind geo data
 ## Installation
 
 ```bash
-$ go install github.com/major1201/geo-cli/cmd/geo
+$ go get -u github.com/major1201/geo-cli/cmd/geo
 ```
 
 ## Usage
