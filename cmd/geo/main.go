@@ -17,8 +17,11 @@ import (
 
 var logger = logging.New("GEO")
 
-// AppVer means the project's version
-const AppVer = "0.2.0"
+// Name inspects the project name
+var Name = "geo"
+
+// Version means the project's version
+var Version = "custom"
 
 func pipe(db *geoip2.Reader, language string) {
 	ipReg, err := regexp.Compile(goutils.RegIPv4)

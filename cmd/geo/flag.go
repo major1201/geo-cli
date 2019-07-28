@@ -7,11 +7,11 @@ import (
 
 func getApp() *cli.App {
 	app := cli.NewApp()
-	app.Name = "geo"
+	app.Name = Name
 	app.HelpName = app.Name
 	app.Usage = "geo ip cli tool"
 	app.ArgsUsage = "[hostname/ip[s]]"
-	app.Version = AppVer
+	app.Version = Version
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:  "help, h",
